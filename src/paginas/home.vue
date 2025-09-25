@@ -51,7 +51,7 @@ const API_BASE = (import.meta.env.VITE_API_URL as string) || "http://localhost:3
 
 onMounted(async () => {
   try {
-    const res = await fetch(`${API_BASE}/productos`);
+    const res = await fetch(`${API_BASE}/api/productos/`);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     productos.value = await res.json();
   } catch (error) {
