@@ -1,10 +1,14 @@
+// src/lib/api.ts
 import axios from "axios";
 
+const RAW = import.meta.env.VITE_API_URL || "";
+if (!RAW) console.error("VITE_API_URL no está definida");
+export const API_BASE = RAW.replace(/\/+$/, ""); // quita barra final
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, // "https://planb-production.up.railway.app"
-  // Si luego usas JWT:
-  // headers: { Authorization: `Bearer ${token}` }
+  baseURL: API_BASE,
+  headers: { "Content-Type": "application/json" },
 });
 
-export const registerUser = (email, password) =>
-  api.post("/api/register/", { email, password }); // OJO barra final
+export const registerUser = (email: string, password: string) =>
+  api.post("/api/register/", { email, password }); // barra final por DRF
