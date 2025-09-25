@@ -11,4 +11,4 @@ export const api = axios.create({
 });
 
 export const registerUser = (email: string, password: string) =>
-  api.post("register/", { email, password }); // barra final por DRF
+  api.post("api/register/", { email, password }); // barra final por DRF
