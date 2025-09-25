@@ -19,29 +19,48 @@
         <button @click="toggleMenu" class="close-btn">✖</button>
       </div>
       <ul>
-        <li><router-link to="/">Inicio</router-link></li>
+        <li><router-link to="/">Catálogo</router-link></li>
         <li><router-link to="/carrito">Carro 🛒</router-link></li>
         <li><router-link to="/acerca">Acerca de nosotros</router-link></li>
       </ul>
     </aside>
 
-    <!-- Contenido temporal (sin productos) -->
-    <main class="contenido">
-      <h2 class="titulo">Bienvenido a iEssence</h2>
-      <p class="subtitulo">Pronto verás aquí el catálogo cuando el endpoint esté listo.</p>
+    <main class="catalogo">
+      <div v-for="p in productos" :key="p.id_producto" class="producto-card">
+        <img :src="p.imagen_url" :alt="p.nombre_producto" />
+        <h3>{{ p.nombre_producto }}</h3>
+        <p>{{ p.descripcion }}</p>
+        <p class="precio">${{ p.precio }}</p>
+        <p class="marca">{{ p.marca }}</p>
+        <button class="btn-agregar">Agregar al carrito</button>
+      </div>
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 const menuOpen = ref(false);
 const toggleMenu = () => { menuOpen.value = !menuOpen.value; };
+
+const productos = ref<any[]>([]);
+
+
+const API_BASE = (import.meta.env.VITE_API_URL as string)
+onMounted(async () => {
+  try {
+    const res = await fetch(`${API_BASE}/api/productos/`);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    productos.value = await res.json();
+  } catch (error) {
+    console.error("Error al obtener los productos:", error);
+  }
+});
 </script>
 
 <style scoped>
-/* Mantengo tus estilos base */
+/* Mantengo tus estilos */
 .home {
   font-family: Arial, sans-serif;
   color: #fff;
@@ -126,21 +145,42 @@ const toggleMenu = () => { menuOpen.value = !menuOpen.value; };
   color: inherit;
 }
 
-/* Contenido temporal */
-.contenido {
+.catalogo {
   display: grid;
-  place-items: center;
-  padding: 3rem 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  padding: 2rem;
 }
 
-.titulo {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+.producto-card {
+  background: #2c2c3e;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
 }
 
-.subtitulo {
-  color: #b0b0c3;
+.producto-card img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
 }
 
+.precio {
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
 
+.marca {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.btn-agregar {
+  background-color: #4cafef;
+  border: none;
+  padding: 0.5rem 1rem;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
 </style>
