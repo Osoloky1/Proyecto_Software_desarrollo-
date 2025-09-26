@@ -1,27 +1,31 @@
+import { defineStore } from 'pinia'
+import { api, loginWithEmailQuick, logout } from '@/lib/api'
 
-import { api, loginWithEmailQuick, logout } from "../lib/api";
-import { defineStore } from "pinia";
+export function registerUser(email: string, password: string): Promise<any> {
 
-
-export function registerUser(email, password) {
-  return api.post("/api/register/", { email, password });
+  return api.post('/api/register/', { email, password })
 }
 
-export const useAuth = defineStore("auth", {
-  state: () => ({
-    email: "",
-    isAuth: !!localStorage.getItem("access_token"),
+interface AuthState {
+  email: string
+  isAuth: boolean
+}
+
+export const useAuth = defineStore('auth', {
+  state: (): AuthState => ({
+    email: '',
+    isAuth: !!localStorage.getItem('access_token'),
   }),
   actions: {
-    async login(email, password) {
-      await loginWithEmailQuick(email, password);
-      this.email = email;
-      this.isAuth = true;
+    async login(email: string, password: string): Promise<void> {
+      await loginWithEmailQuick(email, password)
+      this.email = email
+      this.isAuth = true
     },
-    signout() {
-      logout();
-      this.email = "";
-      this.isAuth = false;
+    signout(): void {
+      logout()
+      this.email = ''
+      this.isAuth = false
     },
   },
-});
+})
