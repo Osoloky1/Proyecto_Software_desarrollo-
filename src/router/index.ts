@@ -1,6 +1,6 @@
 // src/router/index.ts
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuth } from '@/service/auth'
+import { useAuth } from '@/services/auth'
 
 
 
