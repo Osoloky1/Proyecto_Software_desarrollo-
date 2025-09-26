@@ -2,19 +2,37 @@
   <div class="auth-container">
     <div class="auth-box">
       <h2 class="title">Ingresa</h2>
-      <form @submit.prevent="login">
-        <input type="email" v-model="email" placeholder="Dirección de correo" required />
-        <input type="password" v-model="password" placeholder="Contraseña" required />
 
-        <!-- Botones de login social -->
+      <form @submit.prevent="doLogin">
+        <input
+          type="email"
+          v-model="email"
+          placeholder="Dirección de correo"
+          required
+        />
+        <input
+          type="password"
+          v-model="password"
+          placeholder="Contraseña"
+          required
+        />
+
+        <!-- Mensaje de error -->
+        <p v-if="errorMsg" class="error">{{ errorMsg }}</p>
+
+        <!-- Botones de login social (placeholder) -->
         <button type="button" class="btn-social facebook">Sign up with Facebook</button>
         <button type="button" class="btn-social google">Sign up with Google</button>
         <button type="button" class="btn-social apple">Sign up with Apple</button>
+
         <router-link to="/register" class="btn-link">Registrarse</router-link>
 
-        <button type="submit" class="btn-main">Continuar</button>
+        <button type="submit" class="btn-main" :disabled="loading">
+          {{ loading ? "Ingresando..." : "Continuar" }}
+        </button>
       </form>
     </div>
+
     <!-- logo -->
     <router-link to="/" class="logo-link">
       <h1 class="logo">iEssence</h1>
@@ -24,13 +42,34 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+// 👇 Importa el store que definiste en src/services/auth.js
+import { useAuth } from '@/services/auth'
+
+const router = useRouter()
+const auth = useAuth()
 
 const email = ref('')
 const password = ref('')
+const loading = ref(false)
+const errorMsg = ref('')
 
-const login = () => {
-  console.log('Login con:', email.value, password.value)
-  // Aquí conectas al backend o proveedor de auth
+const doLogin = async () => {
+  errorMsg.value = ''
+  loading.value = true
+  try {
+    await auth.login(email.value, password.value) // usa loginWithEmailQuick internamente
+    router.push('/') // redirige al home
+  } catch (e: any) {
+    // Mensaje de error amigable
+    errorMsg.value =
+      e?.response?.data?.detail ||
+      e?.response?.data?.error ||
+      e?.message ||
+      'Error de login'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -70,6 +109,10 @@ input {
   margin-top: 1rem;
   cursor: pointer;
 }
+.btn-main:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
 .btn-social {
   width: 100%;
   padding: 0.6rem;
@@ -78,17 +121,21 @@ input {
   border: none;
   cursor: pointer;
 }
-.facebook {
-  background: #3b5998;
-  color: white;
+.facebook { background: #3b5998; color: white; }
+.google   { background: #db4437; color: white; }
+.apple    { background: #000;    color: white; }
+
+.btn-link {
+  display: inline-block;
+  margin-top: .4rem;
+  color: #1c2147;
+  text-decoration: underline;
 }
-.google {
-  background: #db4437;
-  color: white;
-}
-.apple {
-  background: #000;
-  color: white;
+
+.error {
+  color: #c1121f;
+  margin: 0.4rem 0;
+  font-size: 0.9rem;
 }
 
 .logo-link {
@@ -100,8 +147,5 @@ input {
   font-size: 1.8rem;
   font-weight: bold;
 }
-
-.logo {
-  margin: 0;
-}
+.logo { margin: 0; }
 </style>

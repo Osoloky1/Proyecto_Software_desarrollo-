@@ -10,6 +10,7 @@
       <div class="user-actions">
         <router-link to="/login" class="btn-link">Login</router-link>
         <router-link to="/register" class="btn-link">Registrarse</router-link>
+        <router-link to="/privado" class="btn-link">privado</router-link>
         <span class="user-icon">👤</span>
       </div>
     </header>
